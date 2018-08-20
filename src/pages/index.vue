@@ -25,9 +25,9 @@
               label="操作"
               width="100">
               <template slot-scope="scope">
-                <el-button @click="showGroupInfo(scope.row.id)" type="text" size="small">查看</el-button>
+                <el-button @click="showGroupInfo(scope.$index)" type="text" size="small">查看</el-button>
                 
-                <el-button type="text" @click="deleteGroup(scope.row.id)" size="small">删除</el-button>
+                <el-button type="text" @click="deleteGroup(scope.$index)" size="small">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -187,28 +187,45 @@ export default {
   },
   methods: {
     toInit() {
-      var choosegroupData = new Array(ggroupInfo.length);
-      for (var i = 0; i < ggroupInfo.length; i++) {
-        choosegroupData[i] = {};
-        choosegroupData[i].id = i + 1;
-        choosegroupData[i].groupname = ggroupInfo[i].name;
-      }
-      this.choosegroup = choosegroupData;
-      this.tableData = choosegroupData;
-      this.groupdetail = ggroupInfo;
+      // 传回的数据结构与全局变量ggroupInfo相同
+      this.$ajax.get('/groupInfo?UID=12345')
+        .then(response => {
+          ggroupInfo = response;
+          var choosegroupData = new Array(ggroupInfo.length);
+          for (var i = 0; i < ggroupInfo.length; i++) {
+            choosegroupData[i] = {};
+            choosegroupData[i].id = i + 1;
+            choosegroupData[i].groupname = ggroupInfo[i].name;
+          }
+          this.choosegroup = choosegroupData;
+          this.tableData = choosegroupData;
+          this.groupdetail = ggroupInfo;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
     handleClick(row) {
       console.log(row);
     },
     onSubmit() {
-      var data = {};
-      data.name = this.form.groupname;
-      data.members = new Array();
-      data.members = this.form.member;
-      var len = ggroupInfo.length;
-      data.id = len + 1;
-      ggroupInfo.push(data);
-      this.toInit();
+      // this.form = {groupname:'',member:[{id:'',name:''},...]}
+      this.$ajax.post('/createGroup', this.form)  
+        .then(response => {
+          var data = {};
+          data.name = this.form.groupname;
+          data.members = new Array();
+          data.members = this.form.member;
+          var len = ggroupInfo.length;
+          // 返回的群id
+          data.id = response.id;
+          ggroupInfo.push(data);
+          this.toInit();
+        })  
+        .catch(function(catchres) { 
+          console.log(catchres);  
+          console.log("连接失败") 
+        })  
     },
     onClear(){
       this.form.groupname = "";
@@ -223,9 +240,9 @@ export default {
       this.sendmission.location = '';
       this.sendmission.mission = '';
     },
-    showGroupInfo(id){
-      this.groupInfo.members = ggroupInfo[id - 1].members;
-      this.groupInfo.history = history[id - 1];
+    showGroupInfo(index){
+      this.groupInfo.members = ggroupInfo[index].members;
+      this.groupInfo.history = history[index];
       this.showmsgInfo = true;
     },
     handleNodeClick(data) {
@@ -238,11 +255,17 @@ export default {
       this.form.member.splice(this.form.member.indexOf(tag), 1);
     },
     deleteGroup(id) {
-      console.log(id);
-      //ggroupInfo.splice(id - 1,1);
-      this.$refs.membertree.remove(id);
-      //this.groupdetail.splice(id - 1,1);
-      this.toInit();
+      //{}
+      this.$ajax.post('/deleteGroup', {id:id})  
+        .then(response => {
+          this.$refs.membertree.remove(id);
+          //this.groupdetail.splice(id - 1,1);
+          this.toInit();
+        })  
+        .catch(function(catchres) { 
+          console.log(catchres);  
+          console.log("连接失败") 
+        })
     }
   },
   mounted() {
