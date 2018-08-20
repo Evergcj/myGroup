@@ -87,7 +87,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="活动时间:">
-              <el-date-picker type="datetime" placeholder="选择日期" v-model="sendmission.acttime" style="width: 100%;"></el-date-picker>
+              <el-date-picker type="datetime" placeholder="选择日期" value-format= "yyyy-MM-dd HH:mm:ss" v-model="sendmission.acttime" style="width: 100%;"></el-date-picker>
             </el-form-item>
             <el-form-item label="地点:">
               <el-input v-model="sendmission.location"></el-input>
@@ -216,7 +216,7 @@ export default {
     },
     onSubmit() {
       // this.form = {groupname:'',member:""}
-      alert(this.form.groupname +":::"+this.form.member);
+      //alert(this.form.groupname +":::"+this.form.member);
       this.$ajax.post('/createGroup', this.form)  
         .then(response => {
           var data = {};
@@ -240,7 +240,15 @@ export default {
       this.form.member = [];
     },
     onSend() {
-      console.log('Send!');
+      //console.log(this.sendmission)
+      this.$ajax.post('/sendmission', this.sendmission)  
+        .then(response => {
+          this.missionClear();
+        })  
+        .catch(function(catchres) { 
+          console.log(catchres);  
+          console.log("连接失败") 
+        })  
     },
     missionClear() {
       this.sendmission.groups = [];
