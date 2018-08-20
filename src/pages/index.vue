@@ -215,7 +215,8 @@ export default {
       console.log(row);
     },
     onSubmit() {
-      // this.form = {groupname:'',member:[{id:'',name:''},...]}
+      // this.form = {groupname:'',member:""}
+      alert(this.form.groupname +":::"+this.form.member);
       this.$ajax.post('/createGroup', this.form)  
         .then(response => {
           var data = {};
@@ -226,6 +227,7 @@ export default {
           // 返回的群id
           data.id = response.id;
           ggroupInfo.push(data);
+          this.onClear();
           this.toInit();
         })  
         .catch(function(catchres) { 
