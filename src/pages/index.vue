@@ -40,7 +40,13 @@
               <el-input v-model="form.groupname"></el-input>
             </el-form-item>
             <el-form-item label="成员:" style="margin-bottom:7px;">
-              <el-popover
+              <el-input
+                type="textarea"
+                :autosize="{ minRows: 2}"
+                placeholder="请输入成员邮箱"
+                v-model="form.member">
+              </el-input>
+              <!-- <el-popover
                 placement="bottom"
                 width="400"
                 trigger="click">
@@ -63,7 +69,7 @@
                     </el-tag>
                 </div>
                 
-              </el-popover>
+              </el-popover> -->
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="onSubmit">确认添加</el-button>
@@ -199,7 +205,7 @@ export default {
           }
           this.choosegroup = choosegroupData;
           this.tableData = choosegroupData;
-          this.groupdetail = ggroupInfo;
+          //this.groupdetail = ggroupInfo;
         })
         .catch(function (error) {
           console.log(error);
